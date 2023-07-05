@@ -26,9 +26,10 @@ void Server::listening(int socket)
 {
     while(1)
     {
-        socklen_t size;
+       
         int newsockfd;
         struct sockaddr_in server_addr;
+        socklen_t size;
         size = sizeof(server_addr);
 
         listen(socket, 5);
@@ -43,13 +44,14 @@ void Server::listening(int socket)
 
 void Server::handle_connection(int server)
 {
-    socklen_t size;
     int client;
     bool isExit = false;
+    client = socket(AF_INET, SOCK_STREAM, 0);
+
     int bufsize = 1024;
     char buffer[bufsize];
     struct sockaddr_in server_addr;
-    client = socket(AF_INET, SOCK_STREAM, 0);
+    socklen_t size;
     size = sizeof(server_addr);
 
     if (client < 0) 
@@ -65,7 +67,6 @@ void Server::handle_connection(int server)
         cout << "=> Error binding connection, the socket has already been established..." << endl;
         return;
     }
-    size = sizeof(server_addr);
     cout << "=> Looking for clients..." << endl;
     int clientCount = 1;
     server = accept(client,(struct sockaddr *)&server_addr,&size);
