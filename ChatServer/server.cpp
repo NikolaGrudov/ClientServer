@@ -9,16 +9,18 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <thread>
+#include "server.h"
 using namespace std;
 
+void Server::create_server()
+{
+    int portNum = 8899;
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htons(INADDR_ANY);
+    server_addr.sin_port = htons(portNum);
 
-class Server{
-    public:
-        Server() {}
-        void listening(int socket);
-        virtual void handle_connection(int sockfd);
-        ~Server() {}
-};
+}
 
 void Server::listening(int socket)
 {
@@ -26,11 +28,7 @@ void Server::listening(int socket)
     {
         socklen_t size;
         int newsockfd;
-        int portNum = 8899;
         struct sockaddr_in server_addr;
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_addr.s_addr = htons(INADDR_ANY);
-        server_addr.sin_port = htons(portNum);
         size = sizeof(server_addr);
 
         listen(socket, 5);
@@ -45,15 +43,14 @@ void Server::listening(int socket)
 
 void Server::handle_connection(int server)
 {
+    socklen_t size;
     int client;
-    int portNum = 8899;
     bool isExit = false;
     int bufsize = 1024;
     char buffer[bufsize];
-
-    socklen_t size;
-
+    struct sockaddr_in server_addr;
     client = socket(AF_INET, SOCK_STREAM, 0);
+    size = sizeof(server_addr);
 
     if (client < 0) 
     {
@@ -62,11 +59,6 @@ void Server::handle_connection(int server)
     }
 
     cout << "\n=> Socket server has been created..." << endl;
-
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = htons(INADDR_ANY);
-    server_addr.sin_port = htons(portNum);
 
     if (bind(client, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) 
     {
