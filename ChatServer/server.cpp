@@ -11,7 +11,39 @@
 #include <thread>
 using namespace std;
 
-void handle_connection(int server)
+
+class Server{
+    public:
+        Server() {}
+        void listening(int socket);
+        virtual void handle_connection(int sockfd);
+        ~Server() {}
+};
+
+void Server::listening(int socket)
+{
+    while(1)
+    {
+        socklen_t size;
+        int newsockfd;
+        int portNum = 8899;
+        struct sockaddr_in server_addr;
+        server_addr.sin_family = AF_INET;
+        server_addr.sin_addr.s_addr = htons(INADDR_ANY);
+        server_addr.sin_port = htons(portNum);
+        size = sizeof(server_addr);
+
+        listen(socket, 5);
+        newsockfd = accept(socket,(struct sockaddr *)&server_addr ,&size);
+        if(newsockfd < 0){
+            std::cerr<<"Error: Failed to connect to incoming connection.\n";
+        }
+        std::thread t1(&Server::handle_connection, this, newsockfd);
+        t1.detach();
+    }
+}
+
+void Server::handle_connection(int server)
 {
     int client;
     int portNum = 8899;
@@ -96,27 +128,4 @@ void handle_connection(int server)
     }
 
     close(client);
-}
-
-void listen(int socket)
-{
-    while(1)
-    {
-        socklen_t size;
-        int newsockfd;
-        int portNum = 8899;
-        struct sockaddr_in server_addr;
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_addr.s_addr = htons(INADDR_ANY);
-        server_addr.sin_port = htons(portNum);
-        size = sizeof(server_addr);
-
-        listen(socket, 5);
-        newsockfd = accept(socket,(struct sockaddr *)&server_addr ,&size);
-        if(newsockfd < 0){
-            std::cerr<<"Error: Failed to connect to incoming connection.\n";
-        }
-        std::thread t1(handle_connection, this, newsockfd);
-        t1.detach();
-    }
 }
