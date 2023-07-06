@@ -14,12 +14,20 @@ using namespace std;
 
 void Server::create_server()
 {
+    int sockfd;
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
     int portNum = 8899;
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htons(INADDR_ANY);
     server_addr.sin_port = htons(portNum);
 
+    if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) 
+    {
+        cout << "=> Error binding connection, the socket has already been established..." << endl;
+        return;
+    }
+    listening(sockfd);
 }
 
 void Server::listening(int socket)
@@ -34,7 +42,8 @@ void Server::listening(int socket)
 
         listen(socket, 5);
         newsockfd = accept(socket,(struct sockaddr *)&server_addr ,&size);
-        if(newsockfd < 0){
+        if(newsockfd < 0)
+        {
             std::cerr<<"Error: Failed to connect to incoming connection.\n";
         }
         std::thread t1(&Server::handle_connection, this, newsockfd);
@@ -46,13 +55,9 @@ void Server::handle_connection(int server)
 {
     int client;
     bool isExit = false;
-    client = socket(AF_INET, SOCK_STREAM, 0);
 
     int bufsize = 1024;
     char buffer[bufsize];
-    struct sockaddr_in server_addr;
-    socklen_t size;
-    size = sizeof(server_addr);
 
     if (client < 0) 
     {
@@ -62,17 +67,8 @@ void Server::handle_connection(int server)
 
     cout << "\n=> Socket server has been created..." << endl;
 
-    if (bind(client, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) 
-    {
-        cout << "=> Error binding connection, the socket has already been established..." << endl;
-        return;
-    }
     cout << "=> Looking for clients..." << endl;
     int clientCount = 1;
-    server = accept(client,(struct sockaddr *)&server_addr,&size);
-
-    if (server < 0) 
-        cout << "=> Error on accepting..." << endl;
 
 
     while (server > 0) 
@@ -82,18 +78,23 @@ void Server::handle_connection(int server)
         cout << "=> Connected with the client #" << clientCount << ", you are good to go..." << endl;
         cout << "\n=> Enter # to end the connection\n" << endl;
         cout << "Client: ";
-        do {
+        do 
+        {
             recv(server, buffer, bufsize, 0);
             cout << buffer << " ";
-            if (*buffer == '#') {
+            if (*buffer == '#') 
+            {
                 *buffer = '*';
                 isExit = true;
             }
-        } while (*buffer != '*');
+        } 
+        while (*buffer != '*');
 
-        do {
+        do 
+        {
             cout << "\nServer: ";
-            do {
+            do 
+            {
                 cin >> buffer;
                 send(server, buffer, bufsize, 0);
                 if (*buffer == '#') {
@@ -101,19 +102,23 @@ void Server::handle_connection(int server)
                     *buffer = '*';
                     isExit = true;
                 }
-            } while (*buffer != '*');
+            }
+            while (*buffer != '*');
 
             cout << "Client: ";
-            do {
+            do 
+            {
                 recv(server, buffer, bufsize, 0);
                 cout << buffer << " ";
                 if (*buffer == '#') {
                     *buffer = '*';
                     isExit = true;
                 }
-            } while (*buffer != '*');
-        } while (!isExit);
-        cout << "\n\n=> Connection terminated with IP " << inet_ntoa(server_addr.sin_addr);
+            } 
+            while (*buffer != '*');
+        } 
+        while (!isExit);
+        cout << "\n\n=> Connection terminated with IP ";
         close(server);
         cout << "\nGoodbye..." << endl;
         isExit = false;
