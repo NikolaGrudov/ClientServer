@@ -36,12 +36,12 @@ void Server::listening(int socket)
     {
        
         int newsockfd;
-        struct sockaddr_in server_addr;
+        struct sockaddr_in client_addr;
         socklen_t size;
-        size = sizeof(server_addr);
+        size = sizeof(client_addr);
 
         listen(socket, 5);
-        newsockfd = accept(socket,(struct sockaddr *)&server_addr ,&size);
+        newsockfd = accept(socket,(struct sockaddr *)&client_addr ,&size);
         if(newsockfd < 0)
         {
             std::cerr<<"Error: Failed to connect to incoming connection.\n";
