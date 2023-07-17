@@ -53,19 +53,10 @@ void Server::listening(int socket)
 
 void Server::handle_connection(int server)
 {
-    int client;
     bool isExit = false;
 
-    int bufsize = 1024;
+    const int bufsize = 1024;
     char buffer[bufsize];
-
-    if (client < 0) 
-    {
-        cout << "\nError establishing socket..." << endl;
-        exit(1);
-    }
-
-    cout << "\n=> Socket server has been created..." << endl;
 
     cout << "=> Looking for clients..." << endl;
     int clientCount = 1;
