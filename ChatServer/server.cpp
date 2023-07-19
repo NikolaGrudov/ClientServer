@@ -115,6 +115,4 @@ void Server::handle_connection(int server)
         isExit = false;
         exit(1);
     }
-
-    close(client);
 }
