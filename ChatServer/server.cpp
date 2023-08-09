@@ -116,3 +116,9 @@ void Server::handle_connection(int server)
         exit(1);
     }
 }
+
+int main()
+{
+    Server s;
+    s.create_server();
+}
